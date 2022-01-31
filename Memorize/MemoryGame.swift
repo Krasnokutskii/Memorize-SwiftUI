@@ -25,7 +25,10 @@ struct MemoryGame<CardContent>where CardContent: Equatable {
         }
     }
     
-    private var indexOfOneAndOnlyFaceUpCard: Int?
+    private var indexOfOneAndOnlyFaceUpCard: Int?{
+        get{cards.indices.filter({cards[$0].isFaceUp == true}).oneAndOnly}
+        set{cards.indices.forEach{cards[$0].isFaceUp = ( $0 == newValue )}}
+    }
     
     init(theme: CardTheme, numberOfPairsOfCard: Int, createCardContent: (Int)->CardContent){
         for pairIndex in 0..<numberOfPairsOfCard{
@@ -34,10 +37,11 @@ struct MemoryGame<CardContent>where CardContent: Equatable {
             cards.append(Card(content: content, id: pairIndex * 2 + 1))
         }
         cardTheme = theme
-        cards.shuffle()
-       
+        shuffle()
     }
-    
+    mutating func shuffle(){
+        cards.shuffle()
+    }
     mutating func choose(_ card: Card){
         if let chosenIndex = cards.firstIndex(where:{ $0.id == card.id}),
         !cards[chosenIndex].isFaceUp,
@@ -47,16 +51,14 @@ struct MemoryGame<CardContent>where CardContent: Equatable {
                     cards[chosenIndex].isMatched = true
                     cards[potentialMatchingIndex].isMatched = true
                 }
-                indexOfOneAndOnlyFaceUpCard = nil
+                cards[chosenIndex].isFaceUp = true
             }else{
-                for index in cards.indices{
-                    cards[index].isFaceUp = false
-                }
+//                for index in cards.indices{
+//                    cards[index].isFaceUp = false
+//                }
                 indexOfOneAndOnlyFaceUpCard = chosenIndex
             }
-            cards[chosenIndex].isFaceUp.toggle()
         }
-        print("chosen card id \(cards))")
     }
     
     
@@ -64,12 +66,21 @@ struct MemoryGame<CardContent>where CardContent: Equatable {
         
         var isFaceUp = false
         var isMatched = false
-        var content: CardContent
-        var id: Int
+        let content: CardContent
+        let id: Int
     }
     enum CardTheme: CaseIterable{
         case activity
         case flowers
         case vehicles
+    }
+}
+extension Array{
+    var oneAndOnly: Element?{
+        if count == 1{
+            return first
+        }else{
+            return nil
+        }
     }
 }

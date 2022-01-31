@@ -11,7 +11,7 @@ class EmojiMemoryGame: ObservableObject{
     static let vehicles = ["🛳","✈️","🚁","🚙","🚎","🚛","🚕","🚐","🚝","🛵","🚲","🏍","🛴","🚂","🚡","🚒","🚤","⛵️","⛽️"]
     static let activity = ["💃","⚽️","🎼","🏋️‍♂️","🚴","🏂","🤺","🧘‍♀️","🎾","🏈"]
     static let flowers = ["🌹","🌸","🌺","🌷","🌻","🌼","💐","🥀"]
-    
+    typealias Card = MemoryGame<String>.Card
     static func createMemoryGame(numberOfPairsOfCard: Int)->MemoryGame<String>{
         let theme: MemoryGame<String>.CardTheme = .allCases.randomElement() ?? .vehicles
         var currentEmojis = [String]()
@@ -29,26 +29,30 @@ class EmojiMemoryGame: ObservableObject{
         return memoryGame
     }
     
-    @Published private var model = createMemoryGame(numberOfPairsOfCard: 4)
+    @Published private var game = createMemoryGame(numberOfPairsOfCard: 4)
     
-    var cards: [MemoryGame<String>.Card]{
-        return model.cards
+    var cards: [Card]{
+        return game.cards
     }
     var themeName: String{
-        return model.themeName
+        return game.themeName
     }
     
     var theme: MemoryGame<String>.CardTheme{
-        return model.cardTheme
+        return game.cardTheme
     }
     //MARK: - Intent(s)
     
-    func choose(_ card: MemoryGame<String>.Card){
-        model.choose(card)
+    func choose(_ card: Card){
+        game.choose(card)
     }
     
     func newGame(){
-        model = EmojiMemoryGame.createMemoryGame(numberOfPairsOfCard: Int.random(in: 2..<6))
+        game = EmojiMemoryGame.createMemoryGame(numberOfPairsOfCard: Int.random(in: 2..<8))
+    }
+    
+    func shuffle(){
+        game.shuffle()
     }
     
     
